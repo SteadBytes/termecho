@@ -17,14 +17,15 @@ ioctl_write_ptr_bad!(tiocsti_write, TIOCSTI, c_char);
 #[derive(Debug, StructOpt)]
 #[structopt(name = "termecho", about = "Send commands and write data to tty/pts")]
 struct Opt {
-    #[structopt(short = "d", long = "device", required = true)]
+    /// tty/pts devices to send to
+    #[structopt(required = true)]
     devices: Vec<PathBuf>,
-    #[structopt(short = "c", required = true)]
+    /// Command to send/data to write. A trailing newline is inserted by
+    /// default e.g. <cmd> will be execute. See -n flag to disable this.
+    #[structopt(required = true, last = true)]
     cmd: Vec<String>,
-    #[structopt(
-        short = "n",
-        help = "Write without a trailing newline e.g. will not execute command"
-    )]
+    /// Write <cmd> without a trailing newline e.g. will not execute command.
+    #[structopt(short = "n")]
     no_newline: bool,
 }
 
