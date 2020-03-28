@@ -85,7 +85,7 @@ pub fn parse_cmd(cmd: Vec<String>, no_newline: bool) -> Result<CString, NulError
 // TODO: Expose functionality as a library
 fn main() {
     let opt = Opt::from_args();
-    let s = parse_cmd(opt.cmd, opt.no_newline).expect("cmd cannot be parsed to a valid CString");
+    let s = parse_cmd(opt.cmd, opt.no_newline).expect("<cmd> cannot be parsed to a valid CString");
     for devpath in opt.devices {
         let devpath_str = format!("{}", devpath.display());
         match termecho(&devpath, &s) {
