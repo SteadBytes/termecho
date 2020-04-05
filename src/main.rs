@@ -78,7 +78,7 @@ fn termecho<P: AsRef<Path>>(devpath: &P, s: &CString) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn parse_cmd(cmd: Vec<String>, no_newline: bool) -> Result<CString, NulError> {
+fn parse_cmd(cmd: Vec<String>, no_newline: bool) -> Result<CString, NulError> {
     CString::new(cmd.join(" ") + if no_newline { "" } else { "\n" })
 }
 
@@ -97,5 +97,31 @@ fn main() {
             Err(Error::Nix(e)) => eprintln!("Unable to write to {}: {:?}", devpath_str, e),
             Ok(_) => println!("{} OK", devpath_str),
         };
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! vec_of_strings {
+        ($($x:expr),*) => (vec![$($x.to_string()),*]);
+    }
+
+    #[test]
+    fn parse_cmd_newline() {
+        let cmd = parse_cmd(vec_of_strings!["ls", "-al"], false).unwrap();
+        assert_eq!(cmd, CString::new("ls -al\n").unwrap());
+    }
+
+    #[test]
+    fn parse_cmd_no_newline() {
+        let cmd = parse_cmd(vec_of_strings!["ls", "-al"], true).unwrap();
+        assert_eq!(cmd, CString::new("ls -al").unwrap());
+    }
+
+    #[test]
+    fn parse_cmd_invalid_cstring() {
+        assert!(parse_cmd(vec_of_strings!["ls\0", "-al"], true).is_err());
     }
 }
